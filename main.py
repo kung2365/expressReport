@@ -192,15 +192,22 @@ def getODList():
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
     ODList = []
+    print( values)
 
     if not values:
         print('No data found.')
     else:
         # print('Name, Major:')
         for row in values:
-            ODList.append(str(row[0]))
+            try:
+                if row[0] != '':
+                    ODList.append(str(row[0]))
+            except:
+                ODList.append('NoSheet')
+
             # Print columns A and E, which correspond to indices 0 and 4.
             # print(row)
+    print(ODList)
     return ODList
 
 
@@ -443,7 +450,7 @@ def writeSheet():
     print(usingPR)
     for i in getODList():
         # print(i, '--')
-        if not (i in usingOD):
+        if not (i in usingOD) and i != '':
             print(i, '----')
             SheetID2 = drive.newSheet(i)
             appendODList(i, SheetID2)
@@ -458,11 +465,13 @@ def writeSheet():
     for i in getODList():
         idx = 0
         for od in usingOD:
-            if i in od:
+            if i == str(od):
                 sheetID = usingODSheetID[idx]
             idx += 1
 
-        updateLink(sheetID, sheetIDIndex)
+        if i != 'NoSheet':
+            updateLink(sheetID, sheetIDIndex)
+
         print(sheetID, '>>>>>>>>>>>>>>>>>>>>>>')
         # sheetValue = getSheetData(usingODSheetID[sheetIDIndex])
         # print(sheetValue)
