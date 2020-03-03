@@ -477,7 +477,6 @@ def sheetUpdate():
     usingODSheetID = []
 
 
-
 def is_notUpdate(OD, sheetID):
     if getSheetSize(sheetID) != getODSize(OD):
         return True
@@ -528,26 +527,38 @@ def writeSheet():
         dataBuffer = []
         if is_notUpdate(i, sheetID):
             print('Sheet is no update')
-            # for j in readdbf.getPRList(i):
-            #     itemIndex = 0
-            #
-            #     for k in readdbf.getItemList(j):
-            #         list_values = [str(v) for v in k.values()]
-            #         list_values.append(i)
-            #         # for l in range()
-            #         # if list_values != sheetValue[itemIndex]:
-            #         print(list_values, '--------')
-            #         dataBuffer.append(list_values)
-            #         itemIndex += 1
-            #
-            #         emtyRow = []
-            #         for dummy in list_values:
-            #             emtyRow.append('')
-            #     dataBuffer.append(emtyRow)
-            # print(sheetID)
-            # writeAllSheet(dataBuffer, sheetID)
+            for j in readdbf.getPRList(i):
+                itemIndex = 0
+
+                for k in readdbf.getItemList(j):
+                    list_values = [str(v) for v in k.values()]
+                    list_values.append(i)
+                    # for l in range()
+                    # if list_values != sheetValue[itemIndex]:
+                    print(list_values, '--------')
+                    dataBuffer.append(list_values)
+                    itemIndex += 1
+
+                    emtyRow = []
+                    for dummy in list_values:
+                        emtyRow.append('')
+                dataBuffer.append(emtyRow)
+            print(sheetID)
+            writeAllSheet(dataBuffer, sheetID)
 
         sheetIDIndex += 1
+
+
+def getODSize(OD):
+    dataBuffer = []
+    size = 0
+    for j in readdbf.getPRList(OD):
+        itemIndex = 0
+
+        size = size + readdbf.getPRSize(j)
+        size += 1
+    print('ODSize ', size - 1)
+    return size - 1
 
 
 def main():
@@ -565,24 +576,5 @@ def main():
         time.sleep(5)
 
 
-def demo1():
-    sheetSize = getSheetSize(sheetID)
-    print(sheetSize)
-
-
-def getODSize(OD):
-    dataBuffer = []
-    size = 0
-    for j in readdbf.getPRList(OD):
-        itemIndex = 0
-
-        size = size + readdbf.getPRSize(j)
-        size += 1
-    print('ODSize ', size - 1)
-    return size - 1
-
 if __name__ == '__main__':
-    # main()
-    sheetID = '1VFqrDAY6xnbgbPPoyI0xhSzKAW8KARwCAjD1_uNAGpA'
-    pr = 'B10000399'
-    writeSheet()
+    main()
