@@ -11,7 +11,6 @@ import copyFile
 import time
 import socket
 
-
 ODsheetID = '1hhzueH6Ha3uzwoQxrXsYBHehj72RbU9fye6nRW2OkbU'
 usingDBSheetID = '1WY9POkGfrSY8pVDJEbsExMI0qIjrBnzV_JYfI4uVlvE'
 
@@ -192,7 +191,7 @@ def getODList():
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
     ODList = []
-    print( values)
+    print(values)
 
     if not values:
         print('No data found.')
@@ -333,6 +332,41 @@ def buildSheetData(data):
     pass
 
 
+def getSheetSize(sheetID):
+    """Shows basic usage of the Sheets API.
+        Prints values from a sample spreadsheet.
+        """
+    creds = None
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('sheets', 'v4', credentials=creds)
+
+    rangeName = 'แผ่น1!A2:B'
+    # Call the Sheets API
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=sheetID,
+                                range=rangeName).execute()
+    values = result.get('values', [])
+    print('Sheet Size ', len(values))
+    return len(values)
+
+
 def updateLink(dataToUpdate, idx):
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
@@ -438,6 +472,19 @@ def is_connected():
     return False
 
 
+def sheetUpdate():
+    usingOD = []
+    usingODSheetID = []
+
+
+
+def is_notUpdate(OD, sheetID):
+    if getSheetSize(sheetID) != getODSize(OD):
+        return True
+    else:
+        return False
+
+
 def writeSheet():
     usingPR = getUsingPR()
     usingOD = []
@@ -461,6 +508,7 @@ def writeSheet():
     for i in getUsingOD():
         usingOD.append(i[0])
         usingODSheetID.append(i[1])
+
     sheetIDIndex = 0
     for i in getODList():
         idx = 0
@@ -472,28 +520,32 @@ def writeSheet():
         if i != 'NoSheet':
             updateLink(sheetID, sheetIDIndex)
 
-        print(sheetID, '>>>>>>>>>>>>>>>>>>>>>>')
+        # print(sheetID, '>>>>>>>>>>>>>>>>>>>>>>')
+        print(i, '*****************')
+        print(sheetID, '++++++++++++++++')
         # sheetValue = getSheetData(usingODSheetID[sheetIDIndex])
         # print(sheetValue)
         dataBuffer = []
-        for j in readdbf.getPRList(i):
-            itemIndex = 0
-
-            for k in readdbf.getItemList(j):
-                list_values = [str(v) for v in k.values()]
-                list_values.append(i)
-                # for l in range()
-                # if list_values != sheetValue[itemIndex]:
-                print(list_values, '--------')
-                dataBuffer.append(list_values)
-                itemIndex += 1
-
-                emtyRow = []
-                for dummy in list_values:
-                    emtyRow.append('')
-            dataBuffer.append(emtyRow)
-        print(sheetID)
-        writeAllSheet(dataBuffer, sheetID)
+        if is_notUpdate(i, sheetID):
+            print('Sheet is no update')
+            # for j in readdbf.getPRList(i):
+            #     itemIndex = 0
+            #
+            #     for k in readdbf.getItemList(j):
+            #         list_values = [str(v) for v in k.values()]
+            #         list_values.append(i)
+            #         # for l in range()
+            #         # if list_values != sheetValue[itemIndex]:
+            #         print(list_values, '--------')
+            #         dataBuffer.append(list_values)
+            #         itemIndex += 1
+            #
+            #         emtyRow = []
+            #         for dummy in list_values:
+            #             emtyRow.append('')
+            #     dataBuffer.append(emtyRow)
+            # print(sheetID)
+            # writeAllSheet(dataBuffer, sheetID)
 
         sheetIDIndex += 1
 
@@ -513,5 +565,24 @@ def main():
         time.sleep(5)
 
 
+def demo1():
+    sheetSize = getSheetSize(sheetID)
+    print(sheetSize)
+
+
+def getODSize(OD):
+    dataBuffer = []
+    size = 0
+    for j in readdbf.getPRList(OD):
+        itemIndex = 0
+
+        size = size + len(readdbf.getItemList(j))
+        size += 1
+    print('ODSize ', size - 1)
+    return size - 1
+
 if __name__ == '__main__':
-    main()
+    # main()
+    sheetID = '1VFqrDAY6xnbgbPPoyI0xhSzKAW8KARwCAjD1_uNAGpA'
+    pr = 'B10000399'
+    writeSheet()
