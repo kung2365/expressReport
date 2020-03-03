@@ -502,8 +502,11 @@ def main():
     while True:
         if is_connected():
             if copyFile.copy():
-                writeSheet()
-                print('Process finish')
+                try:
+                    writeSheet()
+                    print('Process finish')
+                except:
+                    print('Cannot write to sheet')
 
         else:
             print('Internet not connect trying again in 60 sec')
