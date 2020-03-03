@@ -52,6 +52,24 @@ def getItemList(prNumber):
     newlist = sorted(itemList, key=lambda k: k["index"])
     return newlist
 
+def getPRSize(prNumber):
+    path = ".\\temp_db\\OESOIT.DBF"
+
+
+    table = dbf.Table(str(path))
+
+    try:
+        table.open()
+    except:
+        print('read db error')
+
+    size = 0
+    for row in table:
+        if prNumber in str(row[1]) and row[2] != '   ' and row[2] != '@@@':
+            size += 1
+    table.close()
+    return size
+
 
 def getPRList(orderNumber):
     path = ".\\temp_db\\ARTRNRM.DBF"

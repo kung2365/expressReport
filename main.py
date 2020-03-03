@@ -576,7 +576,7 @@ def getODSize(OD):
     for j in readdbf.getPRList(OD):
         itemIndex = 0
 
-        size = size + len(readdbf.getItemList(j))
+        size = size + readdbf.getPRSize(j)
         size += 1
     print('ODSize ', size - 1)
     return size - 1
